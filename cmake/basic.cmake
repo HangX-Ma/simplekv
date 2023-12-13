@@ -1,21 +1,17 @@
 # Basic CMakeLists.txt
 
-set(SIMPLEKV_SRCS
-    ./simplekv.cpp
-)
-set(SIMPLEKV_INCS
-    ./
-)
-add_library(${PROJECT_NAME} ${SIMPLEKV_SRCS})
-target_include_directories(${PROJECT_NAME} PUBLIC ${SIMPLEKV_INCS})
+# collect all files in the following directories and put them into 'SOURCES' variable
+set(SIMPLEKV_SRC ${SIMPLEKV_ROOT_DIR}/simplekv.cpp)
+set(SIMPLEKV_INC ${SIMPLEKV_ROOT_DIR}/simplekv.h)
 
+add_library(${PROJECT_NAME} ${SIMPLEKV_SRC})
+target_include_directories(${PROJECT_NAME} PUBLIC ${SIMPLEKV_INC})
 
-option(SIMPLEKV_BUILD_EXAMPLE "Build example" ON)
+find_package(Threads REQUIRED)
+find_package(GTest REQUIRED)
 
+include_directories(${GTEST_INCLUDE_DIR})
 
-# Example
-if(SIMPLEKV_BUILD_EXAMPLE)
-    add_subdirectory(./example/)
-endif()
+add_subdirectory(${SIMPLEKV_ROOT_DIR}/test)
 
 

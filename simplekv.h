@@ -1,156 +1,98 @@
-/**
- * @file simplekv.h
- * @author Forairaaaaa
- * @brief 
- * @version 0.1
- * @date 2023-05-04
- * 
- * @copyright Copyright (c) 2023
- * 
- */
 #pragma once
 #include <iostream>
 #include <string>
 #include <cstring>
 #include <unordered_map>
 
-
-namespace SIMPLEKV
+namespace simple_kv
 {
-    /* Structure to store data info */
-    struct ValueInfo_t
+/* Structure to store data info */
+struct DataInner
+{
+    size_t size{0};
+    void *addr{nullptr};
+
+    template <typename T>
+    T value()
     {
-        // std::string key = "";
-        size_t size = 0;
-        void* addr = nullptr;
-
-
-        /* Value convertion */
-        template<typename T>
-        T value()
-        {
-            if ((this->addr == nullptr) || (this->size < sizeof(T)))
-            {
-                return T();
-            }
-            return *(T*)this->addr;
+        if ((this->addr == nullptr) || (this->size < sizeof(T))) {
+            return T();
         }
+        return *reinterpret_cast<T *>(this->addr);
+    }
+};
+using DataInner_t = struct DataInner;
 
-    };
-    
-
-    class SimpleKV
+class SimpleKV
+{
+public:
+    ~SimpleKV()
     {
-        private:
-            std::unordered_map<std::string, ValueInfo_t> _value_map;
-            ValueInfo_t _ret_buffer;
+        clear();
+    }
 
+    /** Get the number of elements in the unordered map */
+    inline size_t size()
+    {
+        return map_.size();
+    }
 
-        protected:
-            /* Memory API */
-            /* Free to override for different platforms */
-            virtual void _free(void* ptr) { free(ptr); }
-            virtual void* _malloc(size_t size) { return malloc(size); }
-            virtual void* _memcpy(void* __restrict__ dest, const void* __restrict__ src, size_t n) { return memcpy(dest, src, n); }
+    /** Check if the key exists */
+    bool exist(const std::string &key);
 
+    /**  Get all memory usage of the map */
+    size_t memoryUsage();
 
-        public:
-            ~SimpleKV() { DeleteAll(); }
+    /**
+     * @brief Create a new `DataInner_t` element and store it
+     *
+     * @return true - ok
+     * @return false - already exist or 0 size
+     */
+    bool add(const std::string &key, void *value, size_t size);
 
+    /**
+     * @brief put the value at specific memory
+     *
+     * @return true - ok
+     * @return false - not exist
+     */
+    bool put(const std::string &key, void *value);
 
-            /**
-             * @brief Get the map size (number of elements)
-             * 
-             * @return size_t 
-             */
-            inline size_t Size() { return _value_map.size(); }
+    /**
+     * @brief Get a `DataInner_t` pointer
+     *
+     * @return `nullptr` if key not exist
+     */
+    DataInner_t *get(const std::string &key);
 
-            /**
-             * @brief Check if the passing key is pointing to a data 
-             * 
-             * @param key 
-             * @return true 
-             * @return false 
-             */
-            bool Exist(const std::string& key);
+    /**
+     * @brief remove the key and free the memory
+     *
+     * @return true - ok
+     * @return false - not exist
+     */
+    bool remove(const std::string &key);
 
-            /**
-             * @brief Get all data's memory usage
-             * 
-             * @return size_t 
-             */
-            size_t MemoryUsage();
+    /** remove all pairs in unordered map and free the memory */
+    void clear();
 
-            /**
-             * @brief Database will create a new buffer to store the passing data
-             * 
-             * @param key 
-             * @param value 
-             * @param size 
-             * @return true - ok
-             * @return false - already exist or 0 size
-             */
-            bool Add(const std::string& key, void* value, size_t size);
+    /* Template Wrapper */
+    template <typename T>
+    inline bool add(const std::string &key, T value)
+    {
+        return add(key, reinterpret_cast<void *>(&value), sizeof(T));
+    }
 
-            /**
-             * @brief Database will copy the passing data into the pointing memory
-             * 
-             * @param key 
-             * @param value 
-             * @return true - ok
-             * @return false - not exist
-             */
-            bool Put(const std::string& key, void* value);
+    template <typename T>
+    inline bool put(const std::string &key, T value)
+    {
+        return put(key, reinterpret_cast<void *>(&value));
+    }
 
-            /**
-             * @brief Get a value info pointer that the passing key is pointing to
-             * 
-             * @param key 
-             * @return ValueInfo_t* addr=nullptr if key not exist
-             */
-            ValueInfo_t* Get(const std::string& key);
+private:
+    std::unordered_map<std::string, DataInner_t> map_;
+    DataInner_t data_buffer_;
+};
 
-            /**
-             * @brief Delect the key pointing data and free the memory  
-             * 
-             * @param key 
-             * @return true - ok
-             * @return false - not exist
-             */
-            bool Delete(const std::string& key);
-
-            /**
-             * @brief Delect all data and free the memory 
-             * 
-             */
-            void DeleteAll();
-
-            
-
-            /* Wrap for differnt types */
-
-            /**
-             * @brief Database will create a new buffer to store the passing data
-             * 
-             * @tparam T 
-             * @param key 
-             * @param value 
-             * @return true - ok
-             * @return false - already exist or 0 size
-             */
-            template<typename T>
-            inline bool Add(const std::string& key, T value) { return Add(key, (void*)&value, sizeof(T)); }
-
-            /**
-             * @brief Database will copy the passing data into the pointing memory
-             * 
-             * @tparam T 
-             * @param key 
-             * @param value 
-             * @return true - ok
-             * @return false - not exist
-             */
-            template<typename T>
-            inline bool Put(const std::string& key, T value) { return Put(key, (void*)&value); }
-    };
-}
+} // namespace simple_kv
