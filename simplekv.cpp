@@ -2,7 +2,7 @@
 
 namespace simple_kv
 {
-bool SimpleKV::exist(const std::string &key)
+bool SimpleKV::exist(std::string_view key)
 {
     return map_.count(key) > 0;
 }
@@ -16,7 +16,7 @@ size_t SimpleKV::memoryUsage()
     return usage;
 }
 
-bool SimpleKV::add(const std::string &key, void *value, size_t size)
+bool SimpleKV::add(std::string_view key, void *value, size_t size)
 {
     if (exist(key) || (size == 0)) {
         return false;
@@ -29,7 +29,7 @@ bool SimpleKV::add(const std::string &key, void *value, size_t size)
     return true;
 }
 
-bool SimpleKV::put(const std::string &key, void *value)
+bool SimpleKV::put(std::string_view key, void *value)
 {
     if (!exist(key)) {
         return false;
@@ -39,7 +39,7 @@ bool SimpleKV::put(const std::string &key, void *value)
     return true;
 }
 
-DataInner_t *SimpleKV::get(const std::string &key)
+DataInner_t *SimpleKV::get(std::string_view key)
 {
     if (!exist(key)) {
         data_buffer_.size = 0;
@@ -52,7 +52,7 @@ DataInner_t *SimpleKV::get(const std::string &key)
     return &data_buffer_;
 }
 
-bool SimpleKV::remove(const std::string &key)
+bool SimpleKV::remove(std::string_view key)
 {
     if (!exist(key)) {
         return false;
@@ -66,8 +66,9 @@ bool SimpleKV::remove(const std::string &key)
 
 void SimpleKV::clear()
 {
-    for (const auto &[key, data] : map_) {
+    for (auto &[key, data] : map_) {
         free(data.addr);
+        data.addr = nullptr;
     }
     map_.clear();
 }

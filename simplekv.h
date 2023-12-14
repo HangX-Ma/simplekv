@@ -38,7 +38,7 @@ public:
     }
 
     /** Check if the key exists */
-    bool exist(const std::string &key);
+    bool exist(std::string_view key);
 
     /**  Get all memory usage of the map */
     size_t memoryUsage();
@@ -49,7 +49,7 @@ public:
      * @return true - ok
      * @return false - already exist or 0 size
      */
-    bool add(const std::string &key, void *value, size_t size);
+    bool add(std::string_view key, void *value, size_t size);
 
     /**
      * @brief put the value at specific memory
@@ -57,14 +57,14 @@ public:
      * @return true - ok
      * @return false - not exist
      */
-    bool put(const std::string &key, void *value);
+    bool put(std::string_view key, void *value);
 
     /**
      * @brief Get a `DataInner_t` pointer
      *
      * @return `nullptr` if key not exist
      */
-    DataInner_t *get(const std::string &key);
+    DataInner_t *get(std::string_view key);
 
     /**
      * @brief remove the key and free the memory
@@ -72,26 +72,26 @@ public:
      * @return true - ok
      * @return false - not exist
      */
-    bool remove(const std::string &key);
+    bool remove(std::string_view key);
 
     /** remove all pairs in unordered map and free the memory */
     void clear();
 
     /* Template Wrapper */
     template <typename T>
-    inline bool add(const std::string &key, T value)
+    inline bool add(std::string_view key, T value)
     {
         return add(key, reinterpret_cast<void *>(&value), sizeof(T));
     }
 
     template <typename T>
-    inline bool put(const std::string &key, T value)
+    inline bool put(std::string_view key, T value)
     {
         return put(key, reinterpret_cast<void *>(&value));
     }
 
 private:
-    std::unordered_map<std::string, DataInner_t> map_;
+    std::unordered_map<std::string_view, DataInner_t> map_;
     DataInner_t data_buffer_;
 };
 
