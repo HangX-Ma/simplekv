@@ -13,12 +13,44 @@ Simple Key-Value pair manager in C++17.
 
 You can get detailed usage examples from [test/basic_test.cpp](/test/basic_test.cpp).
 
-GTest is used for easy functional checking.
+GTest is used for easy functional checking. You can easily run tests using following commands.
+
 ```bash
-cmake -B build -S .
+cmake -B build -DSIMPLEKV_BUILD_TESTS=ON
 cmake --build build -j$(nproc)
-cd build && ctest --output-on-failure GTEST_COLOR=TRUE
+cmake --build build --target test
 ```
+
+### Use as third party library
+
+- Add this repository as one of your submodules. This command will download it into `library/simplekv`.
+
+    ```bash
+    git submodule add https://github.com/HangX-Ma/simplekv.git library/simplekv
+    ```
+
+    Your `.gitmodules` will add following contents.
+
+    ```json
+    [submodule "library/simplekv"]
+        path = library/simplekv
+        url = https://github.com/HangX-Ma/simplekv.git
+    ```
+
+- Add the `simplekv` as **subdirectory** in your `library/CMakeLists.txt`.
+
+    ```cmake
+    cmake_minimum_required(VERSION 3.14)
+    project(library)
+    add_subdirectory(simplekv)
+    ```
+    > Don't forget to make `library/CMakeLists.txt` valid in your main project `CMakeLists.txt`.
+
+- Use `target_link_libraries` command in `CMakeLists.txt` to add this library as dependence.
+
+    ```cmake
+    target_link_libraries(${TARGET_NAME} simplekv::simplekv)
+    ```
 
 ## Notice
 

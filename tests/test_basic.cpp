@@ -1,4 +1,4 @@
-#include "simplekv.h"
+#include "simplekv/simplekv.h"
 #include <gtest/gtest.h>
 #include <memory>
 
@@ -25,7 +25,7 @@ TEST(BasicTest, DifferentTypesTest)
 {
     simple_kv::SimpleKV mgr;
 
-    mgr.add<float>("float", 9.99);
+    mgr.add<float>("float", static_cast<float>(9.99));
     EXPECT_FLOAT_EQ(mgr.get("float")->value<float>(), 9.99);
 
     mgr.add<double>("double", 6.66);
@@ -37,8 +37,8 @@ TEST(BasicTest, DifferentTypesTest)
         EXPECT_EQ(mgr.get("array")->value<uint16_t *>()[i], m_array[i]);
     }
 
-    CustomType_t tom{1, 1.11, "Tom"};
-    CustomType_t jerry{2, 2.22, "Jerry"};
+    CustomType_t tom{1, static_cast<float>(1.11), "Tom"};
+    CustomType_t jerry{2, static_cast<float>(2.22), "Jerry"};
     CustomType_t custom_ret;
     mgr.add<CustomType_t>("Tom", tom);
     mgr.add<CustomType_t>("Jerry", jerry);
@@ -64,7 +64,6 @@ TEST(BasicTest, AddRemoveTest)
     // printf("manager has %ld elements\n", mgr.size());
     // printf("manager memory usage: %ld bytes\n", mgr.memoryUsage());
 
-
     mgr.remove("5");
     EXPECT_EQ(mgr.size(), 5);
     EXPECT_EQ(mgr.memoryUsage(), 20);
@@ -89,12 +88,9 @@ TEST(BasicTest, STLContainerTest)
     std::vector<int> ducks{1, 2, 3, 4, 5, 6};
     mgr.add<std::vector<int> *>("Ducks", &ducks);
     auto my_ducks = mgr.get("Ducks")->value<std::vector<int> *>();
-    for (int i = 0; i < 6; i += 1) {
+    for (size_t i = 0; i < 6; i += 1) {
         EXPECT_EQ(my_ducks->at(i), ducks.at(i));
-        EXPECT_EQ(
-            std::addressof(my_ducks->at(i)),
-            std::addressof(ducks.at(i))
-        );
+        EXPECT_EQ(std::addressof(my_ducks->at(i)), std::addressof(ducks.at(i)));
     }
 }
 
