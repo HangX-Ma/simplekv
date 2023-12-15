@@ -1,5 +1,6 @@
 #include "simplekv.h"
 #include <gtest/gtest.h>
+#include <memory>
 
 struct CustomType
 {
@@ -9,10 +10,10 @@ struct CustomType
 };
 using CustomType_t = struct CustomType;
 
-simple_kv::SimpleKV mgr;
-
 TEST(BasicTest, BasicFunctionTest)
 {
+    simple_kv::SimpleKV mgr;
+
     mgr.add<int>("age", 99);
     EXPECT_EQ(mgr.get("age")->value<int>(), 99);
 
@@ -22,6 +23,8 @@ TEST(BasicTest, BasicFunctionTest)
 
 TEST(BasicTest, DifferentTypesTest)
 {
+    simple_kv::SimpleKV mgr;
+
     mgr.add<float>("float", 9.99);
     EXPECT_FLOAT_EQ(mgr.get("float")->value<float>(), 9.99);
 
@@ -51,24 +54,32 @@ TEST(BasicTest, DifferentTypesTest)
 
 TEST(BasicTest, AddRemoveTest)
 {
+    simple_kv::SimpleKV mgr;
+
+    for (int i = 0; i < 6; i += 1) {
+        mgr.add<int>(std::to_string(i), i);
+    }
+    EXPECT_EQ(mgr.size(), 6);
+    EXPECT_EQ(mgr.memoryUsage(), 24);
     // printf("manager has %ld elements\n", mgr.size());
     // printf("manager memory usage: %ld bytes\n", mgr.memoryUsage());
-    EXPECT_EQ(mgr.size(), 6);
-    EXPECT_EQ(mgr.memoryUsage(), 104);
 
-    mgr.remove("Tom");
+
+    mgr.remove("5");
     EXPECT_EQ(mgr.size(), 5);
-    EXPECT_EQ(mgr.memoryUsage(), 64);
+    EXPECT_EQ(mgr.memoryUsage(), 20);
 
     mgr.clear();
     EXPECT_EQ(mgr.size(), 0);
     EXPECT_EQ(mgr.memoryUsage(), 0);
 
-    EXPECT_FALSE(mgr.exist("Jerry"));
+    EXPECT_FALSE(mgr.exist("0"));
 }
 
 TEST(BasicTest, STLContainerTest)
 {
+    simple_kv::SimpleKV mgr;
+
     std::string spike = "Spike";
     mgr.add<std::string *>("Spike", &spike);
     EXPECT_STREQ(mgr.get("Spike")->value<std::string *>()->c_str(), "Spike");
@@ -80,7 +91,10 @@ TEST(BasicTest, STLContainerTest)
     auto my_ducks = mgr.get("Ducks")->value<std::vector<int> *>();
     for (int i = 0; i < 6; i += 1) {
         EXPECT_EQ(my_ducks->at(i), ducks.at(i));
-        EXPECT_EQ((size_t) &my_ducks->at(i), (size_t) &ducks.at(i));
+        EXPECT_EQ(
+            std::addressof(my_ducks->at(i)),
+            std::addressof(ducks.at(i))
+        );
     }
 }
 

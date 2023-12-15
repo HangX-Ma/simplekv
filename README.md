@@ -5,13 +5,20 @@ Simple Key-Value pair manager in C++17.
 
 ## Prerequisite
 
-- GTest (Optional)
+- GTest
 - CMake 3.5.0 or higher
 - Essential build toolchains
 
 ## Usage
 
 You can get detailed usage examples from [test/basic_test.cpp](/test/basic_test.cpp).
+
+GTest is used for easy functional checking.
+```bash
+cmake -B build -S .
+cmake --build build -j$(nproc)
+cd build && ctest --output-on-failure GTEST_COLOR=TRUE
+```
 
 ## Notice
 
