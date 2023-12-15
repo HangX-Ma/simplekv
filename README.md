@@ -13,6 +13,8 @@ Simple Key-Value pair manager in C++17.
 
 You can get detailed usage examples from [test/basic_test.cpp](/test/basic_test.cpp).
 
+### Compile Tests
+
 GTest is used for easy functional checking. You can easily run tests using following commands.
 
 ```bash
@@ -50,6 +52,25 @@ cmake --build build --target test
 
     ```cmake
     target_link_libraries(${TARGET_NAME} simplekv::simplekv)
+    ```
+
+- There are some options that you can use for CMake configuration.
+
+    ```cmake
+    # build shared option
+    option(SIMPLEKV_BUILD_SHARED "Build shared library" OFF)
+
+    # build position independent code
+    option(SIMPLEKV_BUILD_PIC "Build position independent code (-fPIC)" OFF)
+
+    # sanitizer options
+    option(SIMPLEKV_SANITIZE_ADDRESS "Enable address sanitizer in tests" OFF)
+
+    # warning options
+    option(SIMPLEKV_BUILD_WARNINGS "Enable compiler warnings" ${SIMPLEKV_MASTER_PROJECT})
+
+    # testing options
+    option(SIMPLEKV_BUILD_TESTS "Build tests" OFF)
     ```
 
 ## Notice
