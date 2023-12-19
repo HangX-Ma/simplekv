@@ -33,7 +33,7 @@ cmake --build build --target test
 
     Your `.gitmodules` will add following contents.
 
-    ```json
+    ```bash
     [submodule "library/simplekv"]
         path = library/simplekv
         url = https://github.com/HangX-Ma/simplekv.git
